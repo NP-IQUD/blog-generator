@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📝 Blog Generator App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome for Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-indigo-100 to-white text-gray-800 transition-colors duration-300">
+
+  <!-- Navbar -->
+  <nav class="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
+    <div class="text-2xl font-bold text-indigo-700">📝 LikeM Pro</div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="flex flex-col items-center justify-center px-6 py-12 text-center space-y-6">
+    <span class="text-sm font-semibold bg-purple-100 text-purple-700 px-4 py-2 rounded-full">AI Blog Writer</span>
+    <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight text-gray-900">
+      Create long-form content in <span class="text-indigo-600">60 seconds</span>
+    </h1>
+    <p class="text-gray-700 max-w-2xl mx-auto">
+      Enhance your blogs with outlines, SEO optimization, and AI-generated images. Start typing your idea and let AI do the rest!
+    </p>
+
+    <!-- Blog Form -->
+    <form id="blogForm" class="w-full max-w-2xl mt-8 space-y-4 fade-in">
+      <div class="space-y-2">
+        <label for="prompt" class="sr-only">Enter blog topic</label>
+        <input type="text" id="prompt" required
+          class="w-full p-4 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          placeholder="e.g. tips for better sleep" />
+      </div>
+      <button type="submit"
+        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-6 rounded-xl text-lg font-semibold shadow-lg transition">
+        <i class="fas fa-rocket me-2"></i>Generate Blog
+      </button>
+    </form>
+
+    <!-- Result Output -->
+    <div id="result" class="blog-output mt-8 p-8 rounded-xl bg-white shadow-xl text-left max-w-3xl w-full hidden fade-in">
+      <h4 class="text-2xl font-bold mb-4 text-indigo-600"><i class="fas fa-newspaper me-2"></i>Blog Output</h4>
+      <p id="content" class="text-gray-700 whitespace-pre-line"></p>
+    </div>
+
+    <!-- Spinner -->
+    <div id="spinner" class="hidden mt-6">
+      <i class="fas fa-spinner fa-spin text-4xl text-indigo-600"></i>
+    </div>
+  </section>
+
+  <script>
+    const form = document.getElementById('blogForm');
+    const resultDiv = document.getElementById('result');
+    const spinner = document.getElementById('spinner');
+    const contentDiv = document.getElementById('content');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const prompt = document.getElementById('prompt').value;
+      
+      // Hide result and show spinner
+      resultDiv.classList.add('hidden');
+      spinner.classList.remove('hidden');
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt }),
+        });
+        const data = await res.json();
+
+        // Show the result and hide spinner
+        contentDiv.innerHTML = `${data.content}`;
+        resultDiv.classList.remove('hidden');
+        spinner.classList.add('hidden');
+        resultDiv.classList.add('fade-in');
+      } catch (err) {
+        contentDiv.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i> Failed to generate blog content.';
+        resultDiv.classList.remove('hidden');
+        spinner.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
